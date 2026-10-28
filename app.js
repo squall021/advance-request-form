@@ -6,12 +6,14 @@
  let operationQueue=Promise.resolve(),pendingOperations=0,printSession=null,historyRecords=[],historyPage=0;
  const HISTORY_PAGE_SIZE=20;
  const elements={form:document.querySelector('#voucherForm'),printOverlay:document.querySelector('#printOverlay'),saveStatus:document.querySelector('#saveStatus'),toast:document.querySelector('#toast')};
+ // Keep legacy receiverName data compatible with old versions/backups, but never expose a control or print binding.
+ const EDITABLE_FIELDS=Object.keys(model.FIELDS).filter(key=>key!=='receiverName');
  const numberFormatter=new Intl.NumberFormat('zh-TW',{maximumFractionDigits:2});
  let saveTimer=0,toastTimer=0;
  function showToast(message,duration=3500){clearTimeout(toastTimer);elements.toast.textContent=message;elements.toast.classList.add('show');toastTimer=setTimeout(()=>elements.toast.classList.remove('show'),duration);}
  function persist(){clearTimeout(saveTimer);elements.saveStatus.textContent='草稿儲存中…';saveTimer=setTimeout(()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify({...state,recordRef:activeRecord}));elements.saveStatus.textContent='草稿已自動儲存';}catch{elements.saveStatus.textContent='草稿儲存失敗，請匯出備份';}},220);}
  function restore(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(saved){state=model.normalizeSnapshot(saved);if(typeof saved.recordRef?.id==='string'&&typeof saved.recordRef?.versionId==='string')activeRecord={id:saved.recordRef.id,versionId:saved.recordRef.versionId};}}catch{showToast('草稿無法讀取，請由備份或紀錄庫載入');}}
- function syncControlsFromState(){for(const key of Object.keys(model.FIELDS))document.getElementById(key).value=state[key];elements.form.querySelectorAll('[data-check]').forEach(n=>n.checked=state.checks[n.dataset.check]);}
+ function syncControlsFromState(){for(const key of EDITABLE_FIELDS)document.getElementById(key).value=state[key];elements.form.querySelectorAll('[data-check]').forEach(n=>n.checked=state.checks[n.dataset.check]);}
  function fieldActive(key){
   const payment=model.PAYMENTS.find(x=>x[2]===key);if(payment)return state.checks[payment[0]];
   if(['bankName','bankCode','bankAccount','accountName'].includes(key))return state.checks.transfer;
@@ -19,7 +21,7 @@
   if(key==='proofOtherText')return state.checks.proofOther;
   if(key==='basisNote')return ['basisBudget','basisApproval','basisContract'].some(k=>state.checks[k]);return true;
  }
- function updateOptionInputs(){for(const key of Object.keys(model.FIELDS))document.getElementById(key).disabled=Boolean(printSession)||!fieldActive(key);document.querySelector('#bankEditor').hidden=!state.checks.transfer;document.querySelector('#chequeEditor').hidden=!(state.checks.cheque||state.checks.draft);}
+ function updateOptionInputs(){for(const key of EDITABLE_FIELDS)document.getElementById(key).disabled=Boolean(printSession)||!fieldActive(key);document.querySelector('#bankEditor').hidden=!state.checks.transfer;document.querySelector('#chequeEditor').hidden=!(state.checks.cheque||state.checks.draft);}
  function setPrintedText(node,value){const child=document.createElement('span');child.className='printed-text';const content=document.createElement('span');content.className='printed-content';content.textContent=value;child.append(content);node.replaceChildren(child);}
  function fitPrintedText(){elements.printOverlay.querySelectorAll('.printed-field').forEach(node=>{
   node.style.setProperty('--fit-ratio','1');const text=node.querySelector('.printed-content');if(!text)return;text.style.transform='';if(!text.textContent)return;
@@ -58,7 +60,7 @@
  function validateForAction(){const errors=model.validation(state);if(errors.length){showToast(errors[0],6500);return false;}return true;}
  function clearForm(){if(printSession||pendingOperations||!allowReplaceDraft('新增申請單'))return;state=model.normalizeSnapshot({});activeRecord=null;savedFingerprint=null;recordLabel='';recordVersionNumber=0;syncControlsFromState();renderPreview();persist();showToast('已新增申請單，歷史紀錄仍保留');}
  function bindFormEvents(){
-  for(const key of Object.keys(model.FIELDS))document.getElementById(key).addEventListener('input',e=>{state[key]=e.currentTarget.value;renderPreview();persist();});
+  for(const key of EDITABLE_FIELDS)document.getElementById(key).addEventListener('input',e=>{state[key]=e.currentTarget.value;renderPreview();persist();});
   elements.form.querySelectorAll('[data-check]').forEach(n=>n.addEventListener('change',e=>{state.checks[e.currentTarget.dataset.check]=e.currentTarget.checked;renderPreview();persist();}));
   elements.form.addEventListener('submit',e=>e.preventDefault());
   document.querySelector('#clearButton').addEventListener('click',clearForm);document.querySelector('#printButton').addEventListener('click',saveAndPrint);
