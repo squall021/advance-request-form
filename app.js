@@ -24,7 +24,7 @@
  function fitPrintedText(){elements.printOverlay.querySelectorAll('.printed-field').forEach(node=>{
   node.style.setProperty('--fit-ratio','1');const text=node.querySelector('.printed-content');if(!text)return;text.style.transform='';if(!text.textContent)return;
   if(node.classList.contains('multiline')){
-   let ratio=1;for(let i=0;i<35&&(node.scrollHeight>node.clientHeight+1||node.scrollWidth>node.clientWidth+1);i++){ratio*=.94;node.style.setProperty('--fit-ratio',String(ratio));}
+   let ratio=1;for(let i=0;i<35&&(text.getBoundingClientRect().height>node.clientHeight+.5||text.scrollWidth>node.clientWidth+.5);i++){ratio*=.94;node.style.setProperty('--fit-ratio',String(ratio));}
   }else{
    const available=node.getBoundingClientRect().width,natural=text.getBoundingClientRect().width;
    if(natural>available&&available>0){

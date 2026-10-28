@@ -411,8 +411,12 @@ input:disabled,textarea:disabled { color:var(--muted); background:#f2f4f7; opaci
 #preview-notes { height:calc(11.8 * var(--paper-unit)); }
 .receiver-cell { text-align:center; }
 .receiver-cell>span:first-child { display:block; }
-#preview-receiverName { justify-content:center; height:calc(3 * var(--paper-unit)); margin:calc(.5 * var(--paper-unit)) 0 calc(3 * var(--paper-unit)); --field-size:var(--body-size); }
+#preview-receiverName { justify-content:flex-start; height:calc(3 * var(--paper-unit)); margin:calc(.5 * var(--paper-unit)) 0 calc(3 * var(--paper-unit)); --field-size:var(--body-size); }
 .paper-footnote { font-size:var(--body-size); line-height:1.35; margin:calc(1 * var(--paper-unit)) 0 0; }
+/* Text values are left-aligned and centered vertically within their fields. */
+.printed-field.long-text-value { justify-content:flex-start; align-items:center; text-align:left; }
+.multiline.long-text-value { display:flex; }
+.multiline.long-text-value .printed-text { width:100%; flex:0 0 auto; }
 @media(max-width:680px){ .paper-stage{padding:7px;} .badge,.preview-note{white-space:normal;} }
 @page {size:A4 portrait;margin:0;}
 @media print {
