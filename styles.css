@@ -424,3 +424,10 @@ input:disabled,textarea:disabled { color:var(--muted); background:#f2f4f7; opaci
  .advance-document table {break-inside:avoid;page-break-inside:avoid;}
  .printed-field,.printed-text {overflow:visible;}
 }
+
+/* Solid borders remain printable when background graphics are disabled. */
+.print-checkbox.is-selected { position:relative; }
+.print-checkbox.is-selected::after { content:""; position:absolute; top:calc(-.1 * var(--paper-unit)); left:calc(-.1 * var(--paper-unit)); right:calc(-.1 * var(--paper-unit)); height:0; border-top:calc(1.45 * var(--paper-unit)) solid #000; }
+.choice-option input[type="checkbox"] { appearance:none; border:1px solid #718096; border-radius:0; background:#fff; }
+.choice-option input[type="checkbox"]:checked { border:9px solid #000; }
+.choice-option input[type="checkbox"]:focus-visible { outline:3px solid #9bb8ff; outline-offset:3px; }

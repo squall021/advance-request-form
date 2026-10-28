@@ -43,7 +43,7 @@
    else if(model.MONEY.includes(key))value=model.formatMoney(value);
    setPrintedText(node,value);
   });
-  elements.printOverlay.querySelectorAll('[data-print-check]').forEach(node=>{const checked=state.checks[node.dataset.printCheck];node.textContent=checked?'✓':'';node.setAttribute('aria-label',node.getAttribute('aria-label').replace(/(?:已勾選|未勾選)$/,'')+(checked?'已勾選':'未勾選'));});
+  elements.printOverlay.querySelectorAll('[data-print-check]').forEach(node=>{const checked=state.checks[node.dataset.printCheck];node.textContent='';node.classList.toggle('is-selected',checked);node.setAttribute('aria-label',node.getAttribute('aria-label').replace(/(?:已勾選|未勾選)$/,'')+(checked?'已勾選':'未勾選'));});
   const digits=document.querySelector('#amountDigits');digits.replaceChildren(...model.amountDigits(state.advanceAmount).map(value=>{const span=document.createElement('span');span.textContent=value;return span;}));
   const result=model.paymentSummary(state),summary=document.querySelector('#paymentSummary');summary.classList.remove('warning');
   if(result.invalid)summary.textContent='請確認金額格式。';
